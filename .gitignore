@@ -3,6 +3,7 @@ Intermediate/
 DerivedDataCache/
 Saved/
 Build/
+.vs/
 
 *.sln
 *.vcxproj
