@@ -1,0 +1,16 @@
+Binaries/
+Intermediate/
+DerivedDataCache/
+Saved/
+Build/
+
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.log
+*.suo
+*.opensdf
+*.sdf
+*.xlsx
+*.doc
+*.DS_Store
