@@ -4,6 +4,7 @@ DerivedDataCache/
 Saved/
 Build/
 .vs/
+.vscode/
 
 *.sln
 *.vcxproj

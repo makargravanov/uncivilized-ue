@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "Unreal/Environment/TileManager.h"
+#include "TileManager.h"
 
 // Sets default values
 ATileManager::ATileManager()
