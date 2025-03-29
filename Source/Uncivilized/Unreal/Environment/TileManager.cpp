@@ -1,25 +1,25 @@
-
 #include "TileManager.h"
 
-// Sets default values
-ATileManager::ATileManager()
-{
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ATileManager::ATileManager() {
 	PrimaryActorTick.bCanEverTick = true;
 
+	this->tileBiomes = new BiomeType[2048 * 2048]{};
+	height = 2048;
+	width = 2048;
+
+	hexMeshInstances = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshInstances"));
+	RootComponent = hexMeshInstances;
 }
 
-// Called when the game starts or when spawned
-void ATileManager::BeginPlay()
-{
+void ATileManager::BeginPlay() {
 	Super::BeginPlay();
-	
 }
 
-// Called every frame
-void ATileManager::Tick(float DeltaTime)
-{
+void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	Super::EndPlay(EndPlayReason);
+	delete[] this->tileBiomes;
+}
+
+void ATileManager::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
 }
-
