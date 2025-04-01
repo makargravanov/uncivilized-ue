@@ -4,16 +4,13 @@ ATileManager::ATileManager() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	this->tileBiomes = new BiomeType[2048 * 2048]{};
-	height = 2048;
-	width = 2048;
+	gridHeight = 2048;
+	gridWidth = 2048;
 
 	hexMeshInstances = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshInstances"));
 	RootComponent = hexMeshInstances;
 }
 
-void ATileManager::BeginPlay() {
-	Super::BeginPlay();
-}
 
 void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
@@ -22,4 +19,18 @@ void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 
 void ATileManager::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+}
+
+void ATileManager::BeginPlay() {
+	Super::BeginPlay();
+
+	if (!hexMeshInstances || !baseMaterial)
+		return;
+
+	hexMeshInstances->NumCustomDataFloats = 1;
+	hexMeshInstances->SetMaterial(0, baseMaterial);
+
+	if (AActor* player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) {
+		setPlayerPosition(player->GetActorLocation());
+	}
 }

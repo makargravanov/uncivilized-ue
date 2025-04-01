@@ -67,46 +67,61 @@ struct ChunkData {
 	}
 };
 
+
+
+
 UCLASS()
 class UNCIVILIZED_API ATileManager : public AActor {
 	GENERATED_BODY()
 
-  public:
-	// Sets default values for this actor's properties
-	ATileManager();
-
-  protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	UPROPERTY(EditAnywhere, Category = "HexGrid|Materials")
-	UMaterialInterface* baseMaterial;
-
-	UPROPERTY(VisibleAnywhere)
-	UInstancedStaticMeshComponent* hexMeshInstances;
-
-  public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
   private:
-	TMap<FIntPoint, ChunkData> loadedTileChunks;
-	TMap<FIntPoint, ChunkData> loadedHillChunks;
-
+	uint16_t gridHeight = 0;
+	uint16_t gridWidth = 0;
+	uint8_t renderDistance = 2;
 	float tileHorizontalOffset = 173.205078;
 	float oddRowHorizontalOffset = 86.602539;
 	float tileVerticalOffset = 150.0;
 
-	BiomeType* tileBiomes;
 
+	TMap<FIntPoint, ChunkData> loadedTileChunks;
+	TMap<FIntPoint, ChunkData> loadedHillChunks;
+
+	BiomeType* tileBiomes = nullptr;
 	uint8_t* heights = nullptr;
 
-	uint8_t* rotationsTileHillTypeBitMasks = nullptr; 
-	// | 1,2,3,4 | 5,6,7,8 |
-
+	uint8_t* rotationsTileHillTypeBitMasks = nullptr; // | 1,2,3,4 | 5,6,7,8 |
 	uint8_t* rotationsForest = nullptr;
-	
-	uint16_t height;
-	uint16_t width;
+
+	FIntPoint playerChunkPosition;
+
+  public:
+	ATileManager();
+	virtual void Tick(float DeltaTime) override;
+
+  protected:
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void updateVisibleChunks(const FVector& playerPosition);
+	void loadChunk(const FIntPoint& chunkPos);
+	void unloadChunk(const FIntPoint& chunkPos);
+	bool isChunkInRenderDistance(const FIntPoint& chunkPos, const FIntPoint& playerChunkPos) const;
+	FIntPoint worldToChunkPosition(const FVector& worldPosition) const;
+
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Materials")
+	UMaterialInterface* baseMaterial;
+	UPROPERTY(VisibleAnywhere)
+	UInstancedStaticMeshComponent* hexMeshInstances;
+
+  private:
+	FTransform calculateTileTransform(const int32 x, const int32 y) const {
+		const bool oddRow = y % 2 == 1;
+		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
+		const float yPos = y * tileVerticalOffset;
+		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
+	}
+
+	void updateTileMaterial(const int32 instanceIndex, float num) const {
+		hexMeshInstances->SetCustomDataValue(instanceIndex, 0, num, true);
+		hexMeshInstances->MarkRenderStateDirty();
+	}
 };
