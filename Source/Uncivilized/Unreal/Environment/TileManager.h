@@ -29,23 +29,43 @@ enum class BiomeType : uint8_t {
 };
 
 enum class HillType : uint8_t {
-	MOUND = 0,
-	LOW = 1,
-	MEDUIM = 2,
-	HIGH = 3
+	NONE = 0,
+	MOUND = 1,
+	LOW = 2,
+	MEDUIM = 3,
+	HIGH = 4
 };
 
 struct ChunkData {
 	FIntPoint chunkPosition;
 	UInstancedStaticMeshComponent* chunkMesh;
 	bool isLoaded;
+
 	ChunkData() : isLoaded(false), chunkMesh(nullptr) {}
 
-	~ChunkData(){
+	~ChunkData() {
 		delete chunkMesh;
 	}
-};
 
+	ChunkData(const ChunkData&) = delete;
+	ChunkData& operator=(const ChunkData&) = delete;
+
+	ChunkData(ChunkData&& other) noexcept
+		: chunkPosition(std::move(other.chunkPosition)),
+		  chunkMesh(std::exchange(other.chunkMesh, nullptr)),
+		  isLoaded(std::exchange(other.isLoaded, false)) {}
+
+	ChunkData& operator=(ChunkData&& other) noexcept {
+		if (this != &other) {
+			delete chunkMesh;
+
+			chunkPosition = std::move(other.chunkPosition);
+			chunkMesh = std::exchange(other.chunkMesh, nullptr);
+			isLoaded = std::exchange(other.isLoaded, false);
+		}
+		return *this;
+	}
+};
 
 UCLASS()
 class UNCIVILIZED_API ATileManager : public AActor {
@@ -73,7 +93,6 @@ class UNCIVILIZED_API ATileManager : public AActor {
   private:
 	TMap<FIntPoint, ChunkData> loadedTileChunks;
 	TMap<FIntPoint, ChunkData> loadedHillChunks;
-	TMap<FIntPoint, ChunkData> loadedForestChunks;
 
 	float tileHorizontalOffset = 173.205078;
 	float oddRowHorizontalOffset = 86.602539;
@@ -85,8 +104,10 @@ class UNCIVILIZED_API ATileManager : public AActor {
 
 	uint8_t* rotationsTileHillBitMasks = nullptr; 
 	// | 1,2,3,4 | 5,6,7,8 |
-	uint8_t* rotationsForestBuildingBitMasks = nullptr; 
+
+	// uint8_t* rotationsForestBuildingBitMasks = nullptr; 
 	// | 1,2,3,4 | 5,6,7,8 |
+
 	uint8_t* roadRailroadIsElectrificationIsSwampBitMasks = nullptr; 
 	// | 1,2,3 | 4,5,6 | 7 | 8 |
 
