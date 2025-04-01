@@ -102,16 +102,10 @@ class UNCIVILIZED_API ATileManager : public AActor {
 
 	uint8_t* heights = nullptr;
 
-	uint8_t* rotationsTileHillBitMasks = nullptr; 
+	uint8_t* rotationsTileHillTypeBitMasks = nullptr; 
 	// | 1,2,3,4 | 5,6,7,8 |
 
-	// uint8_t* rotationsForestBuildingBitMasks = nullptr; 
-	// | 1,2,3,4 | 5,6,7,8 |
-
-	uint8_t* roadRailroadIsElectrificationIsSwampBitMasks = nullptr; 
-	// | 1,2,3 | 4,5,6 | 7 | 8 |
-
-	uint8_t* 
+	uint8_t* rotationsForest = nullptr;
 	
 	uint16_t height;
 	uint16_t width;
