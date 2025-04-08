@@ -10,18 +10,17 @@ ATileManager::ATileManager() {
 	hexMeshInstances = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshInstances"));
 	RootComponent = hexMeshInstances;
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshFinder(TEXT("Content/Meshes/Hex.fbx"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshFinder(TEXT("/Game/Meshes/Hex.fbx"));
 
 	if (MeshFinder.Succeeded()) {
 		hexMeshInstances->SetStaticMesh(MeshFinder.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialFinder(TEXT("/Game/Path/To/BaseMaterial.BaseMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialFinder(TEXT("/Game/Materials/HexMaterial.uasset"));
 	if (MaterialFinder.Succeeded()) {
 		baseMaterial = MaterialFinder.Object;
 	}
 }
-
 
 void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
@@ -40,6 +39,10 @@ void ATileManager::BeginPlay() {
 
 	hexMeshInstances->NumCustomDataFloats = 1;
 	hexMeshInstances->SetMaterial(0, baseMaterial);
+
+	for (size_t i = 0; i < (2048 * 2048); i++) {
+		BiomeType type = FMath::RandBool() ? BiomeType::GRASSLAND : BiomeType::CHAPPARAL
+	}
 
 	if (AActor* player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) {
 		setPlayerPosition(player->GetActorLocation());
