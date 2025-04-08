@@ -2,11 +2,20 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <functional>
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TileManager.generated.h"
 
 #define CHUNK_SIZE 64
+
+template <>
+struct std::hash<FIntPoint> {
+	size_t operator()(const FIntPoint& Point) const noexcept {
+		return static_cast<size_t>(Point.X) ^ (static_cast<size_t>(Point.Y) << 16);
+	}
+};
 
 enum class BiomeType : uint8_t {
 	OCEAN = 0,
@@ -37,14 +46,14 @@ enum class HillType : uint8_t {
 };
 
 struct ChunkData {
+	bool isLoaded = false;
 	FIntPoint chunkPosition;
 	UInstancedStaticMeshComponent* chunkMesh;
-	bool isLoaded;
 
 	ChunkData() : isLoaded(false), chunkMesh(nullptr) {}
 
 	~ChunkData() {
-		delete chunkMesh;
+		chunkMesh = nullptr;
 	}
 
 	ChunkData(const ChunkData&) = delete;
@@ -57,7 +66,7 @@ struct ChunkData {
 
 	ChunkData& operator=(ChunkData&& other) noexcept {
 		if (this != &other) {
-			delete chunkMesh;
+			chunkMesh = nullptr;
 
 			chunkPosition = std::move(other.chunkPosition);
 			chunkMesh = std::exchange(other.chunkMesh, nullptr);
@@ -66,9 +75,6 @@ struct ChunkData {
 		return *this;
 	}
 };
-
-
-
 
 UCLASS()
 class UNCIVILIZED_API ATileManager : public AActor {
@@ -82,9 +88,8 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	float oddRowHorizontalOffset = 86.602539;
 	float tileVerticalOffset = 150.0;
 
-
-	TMap<FIntPoint, ChunkData> loadedTileChunks;
-	TMap<FIntPoint, ChunkData> loadedHillChunks;
+	std::unordered_map<FIntPoint, ChunkData> loadedTileChunks;
+	std::unordered_map<FIntPoint, ChunkData> loadedHillChunks;
 
 	BiomeType* tileBiomes = nullptr;
 	uint8_t* heights = nullptr;
@@ -106,11 +111,18 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	void unloadChunk(const FIntPoint& chunkPos);
 	bool isChunkInRenderDistance(const FIntPoint& chunkPos, const FIntPoint& playerChunkPos) const;
 	FIntPoint worldToChunkPosition(const FVector& worldPosition) const;
+	void setPlayerPosition(const FVector& newPosition);
+	void loadAssets();
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Materials")
 	UMaterialInterface* baseMaterial;
 	UPROPERTY(VisibleAnywhere)
 	UInstancedStaticMeshComponent* hexMeshInstances;
+
+	UPROPERTY()
+	TSoftObjectPtr<UStaticMesh> hexMeshAsset;
+	UPROPERTY()
+	TSoftObjectPtr<UMaterialInterface> baseMaterialAsset;
 
   private:
 	FTransform calculateTileTransform(const int32 x, const int32 y) const {
