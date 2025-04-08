@@ -9,6 +9,17 @@ ATileManager::ATileManager() {
 
 	hexMeshInstances = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshInstances"));
 	RootComponent = hexMeshInstances;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshFinder(TEXT("Content/Meshes/Hex.fbx"));
+
+	if (MeshFinder.Succeeded()) {
+		hexMeshInstances->SetStaticMesh(MeshFinder.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialFinder(TEXT("/Game/Path/To/BaseMaterial.BaseMaterial"));
+	if (MaterialFinder.Succeeded()) {
+		baseMaterial = MaterialFinder.Object;
+	}
 }
 
 
