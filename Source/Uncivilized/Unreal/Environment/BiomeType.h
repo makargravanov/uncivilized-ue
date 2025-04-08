@@ -1,0 +1,23 @@
+#pragma once
+
+#include <cstdint>
+
+enum class BiomeType : std::uint8_t {
+	OCEAN = 0,
+	LAKE = 1,
+	POLAR_ICE = 2,
+	POLAR_DESERT = 3,
+	TUNDRA = 4,
+	FOREST_TUNDRA = 5,
+	COLD_DESERT = 6,
+	CONIFEROUS_FOREST = 7,
+	DECIDUOUS_FOREST = 8,
+	GRASSLAND = 9,
+	STEPPES = 10,
+	CHAPPARAL = 11,
+	HOT_DESERT = 12,
+	SAVANNA = 13,
+	SUBTROPICAL_FOREST = 14,
+	TROPICAL_SEASONAL_FOREST = 15,
+	TROPICAL_RAIN_FOREST = 16,
+};

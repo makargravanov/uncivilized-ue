@@ -6,6 +6,9 @@
 #include <functional>
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "BiomeType.h"
+#include "HillType.h"
+#include "ChunkData.h"
 #include "TileManager.generated.h"
 
 #define CHUNK_SIZE 64
@@ -17,64 +20,7 @@ struct std::hash<FIntPoint> {
 	}
 };
 
-enum class BiomeType : uint8_t {
-	OCEAN = 0,
-	LAKE = 1,
-	POLAR_ICE = 2,
-	POLAR_DESERT = 3,
-	TUNDRA = 4,
-	FOREST_TUNDRA = 5,
-	COLD_DESERT = 6,
-	CONIFEROUS_FOREST = 7,
-	DECIDUOUS_FOREST = 8,
-	GRASSLAND = 9,
-	STEPPES = 10,
-	CHAPPARAL = 11,
-	HOT_DESERT = 12,
-	SAVANNA = 13,
-	SUBTROPICAL_FOREST = 14,
-	TROPICAL_SEASONAL_FOREST = 15,
-	TROPICAL_RAIN_FOREST = 16,
-};
 
-enum class HillType : uint8_t {
-	NONE = 0,
-	MOUND = 1,
-	LOW = 2,
-	MEDUIM = 3,
-	HIGH = 4
-};
-
-struct ChunkData {
-	bool isLoaded = false;
-	FIntPoint chunkPosition;
-	UInstancedStaticMeshComponent* chunkMesh;
-
-	ChunkData() : isLoaded(false), chunkMesh(nullptr) {}
-
-	~ChunkData() {
-		chunkMesh = nullptr;
-	}
-
-	ChunkData(const ChunkData&) = delete;
-	ChunkData& operator=(const ChunkData&) = delete;
-
-	ChunkData(ChunkData&& other) noexcept
-		: chunkPosition(std::move(other.chunkPosition)),
-		  chunkMesh(std::exchange(other.chunkMesh, nullptr)),
-		  isLoaded(std::exchange(other.isLoaded, false)) {}
-
-	ChunkData& operator=(ChunkData&& other) noexcept {
-		if (this != &other) {
-			chunkMesh = nullptr;
-
-			chunkPosition = std::move(other.chunkPosition);
-			chunkMesh = std::exchange(other.chunkMesh, nullptr);
-			isLoaded = std::exchange(other.isLoaded, false);
-		}
-		return *this;
-	}
-};
 
 UCLASS()
 class UNCIVILIZED_API ATileManager : public AActor {
