@@ -20,8 +20,6 @@ struct std::hash<FIntPoint> {
 	}
 };
 
-
-
 UCLASS()
 class UNCIVILIZED_API ATileManager : public AActor {
 	GENERATED_BODY()
@@ -35,7 +33,6 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	float tileVerticalOffset = 150.0;
 
 	std::unordered_map<FIntPoint, ChunkData> loadedTileChunks;
-	std::unordered_map<FIntPoint, ChunkData> loadedHillChunks;
 
 	BiomeType* tileBiomes = nullptr;
 	uint8_t* heights = nullptr;
@@ -60,15 +57,46 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	void setPlayerPosition(const FVector& newPosition);
 	void loadAssets();
 
-	UPROPERTY(EditAnywhere, Category = "HexGrid|Materials")
+	UPROPERTY()
 	UMaterialInterface* baseMaterial;
-	UPROPERTY(VisibleAnywhere)
-	UInstancedStaticMeshComponent* hexMeshInstances;
+	UPROPERTY()
+	UStaticMesh* hexMesh;
+
+	UPROPERTY()
+	UMaterialInterface* mountainHighPolyMaterial;
+	UPROPERTY()
+	UStaticMesh* mountainHighPolyMesh;
+
+	UPROPERTY()
+	UMaterialInterface* mountainMiddlePolyMaterial;
+	UPROPERTY()
+	UStaticMesh* mountainMiddlePolyMesh;
+
+	UPROPERTY()
+	UMaterialInterface* mountainLowPolyMaterial;
+	UPROPERTY()
+	UStaticMesh* mountainLowPolyMesh;
+
 
 	UPROPERTY()
 	TSoftObjectPtr<UStaticMesh> hexMeshAsset;
 	UPROPERTY()
 	TSoftObjectPtr<UMaterialInterface> baseMaterialAsset;
+
+	UPROPERTY()
+	TSoftObjectPtr<UStaticMesh> mountainHighPolyAsset;
+	UPROPERTY()
+	TSoftObjectPtr<UMaterialInterface> mountainHighPolyMaterialAsset;
+
+	UPROPERTY()
+	TSoftObjectPtr<UStaticMesh> mountainMiddlePolyAsset;
+	UPROPERTY()
+	TSoftObjectPtr<UMaterialInterface> mountainMiddlePolyMaterialAsset;
+
+	UPROPERTY()
+	TSoftObjectPtr<UStaticMesh> mountainLowPolyAsset;
+	UPROPERTY()
+	TSoftObjectPtr<UMaterialInterface> mountainLowPolyMaterialAsset;
 
   private:
 	FTransform calculateTileTransform(const int32 x, const int32 y) const {
@@ -78,8 +106,8 @@ class UNCIVILIZED_API ATileManager : public AActor {
 		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
 	}
 
-	void updateTileMaterial(const int32 instanceIndex, float num) const {
-		hexMeshInstances->SetCustomDataValue(instanceIndex, 0, num, true);
-		hexMeshInstances->MarkRenderStateDirty();
+	void updateTileMaterial(UInstancedStaticMeshComponent* instancedStaticMeshes, const int32 instanceIndex, float num) const {
+		instancedStaticMeshes->SetCustomDataValue(instanceIndex, 0, num, true);
+		instancedStaticMeshes->MarkRenderStateDirty();
 	}
 };

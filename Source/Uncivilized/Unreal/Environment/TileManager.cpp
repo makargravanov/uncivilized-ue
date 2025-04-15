@@ -7,9 +7,6 @@ ATileManager::ATileManager() {
 	this->tileBiomes = new BiomeType[2048 * 2048]{};
 	gridHeight = 2048;
 	gridWidth = 2048;
-
-	hexMeshInstances = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshInstances"));
-	RootComponent = hexMeshInstances;
 }
 
 void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -79,7 +76,7 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 	newChunk.isLoaded = true;
 
 	newChunk.chunkMesh = NewObject<UInstancedStaticMeshComponent>(this);
-	newChunk.chunkMesh->SetStaticMesh(hexMeshInstances->GetStaticMesh());
+	newChunk.chunkMesh->SetStaticMesh(hexMesh);
 	newChunk.chunkMesh->SetMaterial(0, baseMaterial);
 	newChunk.chunkMesh->NumCustomDataFloats = 1;
 	newChunk.chunkMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -129,13 +126,10 @@ void ATileManager::BeginPlay() {
 	Super::BeginPlay();
 	loadAssets();
 
-	if (!hexMeshInstances || !baseMaterial)
+	if (!hexMesh || !baseMaterial)
 		return;
 
-	hexMeshInstances->NumCustomDataFloats = 1;
-	hexMeshInstances->SetMaterial(0, baseMaterial);
-
-	for (size_t i = 0; i < (2048 * 2048); i++) {
+	for (size_t i = 0; i < (static_cast<uint32_t>(gridHeight) * static_cast<uint32_t>(gridWidth)); i++) {
 		tileBiomes[i] = FMath::RandBool() ? BiomeType::GRASSLAND : BiomeType::CHAPPARAL;
 	}
 
@@ -148,17 +142,64 @@ void ATileManager::loadAssets() {
 	hexMeshAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/Hex.Hex")));
 	baseMaterialAsset = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(TEXT("/Game/Materials/HexMaterial.HexMaterial")));
 
+	mountainHighPolyAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/HillHighPoly.HillHighPoly")));
+	mountainHighPolyMaterialAsset = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(TEXT("/Game/Materials/HillHighPolyMaterial.HillHighPolyMaterial")));
+
+	mountainMiddlePolyAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/HillMiddlePoly.HillMiddlePoly")));
+	mountainMiddlePolyMaterialAsset = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(TEXT("/Game/Materials/HillHighMiddlePolyMaterial.HillHighMiddlePolyMaterial")));
+
+	mountainLowPolyAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/HillLowPoly.HillLowPoly")));
+	mountainLowPolyMaterialAsset = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(TEXT("/Game/Materials/HillHighLowPolyMaterial.HillHighLowPolyMaterial")));
+
 	if (UStaticMesh* loadedMesh = hexMeshAsset.LoadSynchronous()) {
-		hexMeshInstances->SetStaticMesh(loadedMesh);
+		hexMesh = loadedMesh
 	}
 	else {
 		UE_LOG(LogTemp, Error, TEXT("Failed to load hex mesh!"));
 	}
-
 	if (UMaterialInterface* loadedMaterial = baseMaterialAsset.LoadSynchronous()) {
 		baseMaterial = loadedMaterial;
 	}
 	else {
 		UE_LOG(LogTemp, Error, TEXT("Failed to load base material!"));
+	}
+
+	if (UStaticMesh* loadedMesh = mountainHighPolyAsset.LoadSynchronous()) {
+		mountainHighPolyMesh = loadedMesh
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainHighPolyAsset mesh!"));
+	}
+	if (UMaterialInterface* loadedMaterial = mountainHighPolyMaterialAsset.LoadSynchronous()) {
+		mountainHighPolyMaterial = loadedMaterial;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainHighPolyMaterialAsset material!"));
+	}
+
+	if (UStaticMesh* loadedMesh = mountainMiddlePolyAsset.LoadSynchronous()) {
+		mountainMiddlePolyMesh = loadedMesh
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainMiddlePolyAsset mesh!"));
+	}
+	if (UMaterialInterface* loadedMaterial = mountainMiddlePolyMaterialAsset.LoadSynchronous()) {
+		mountainMiddlePolyMaterial = loadedMaterial;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainMiddlePolyMaterialAsset material!"));
+	}
+
+	if (UStaticMesh* loadedMesh = mountainLowPolyAsset.LoadSynchronous()) {
+		mountainLowPolyMesh = loadedMesh
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainLowPolyAsset mesh!"));
+	}
+	if (UMaterialInterface* loadedMaterial = mountainLowPolyMaterialAsset.LoadSynchronous()) {
+		mountainLowPolyMaterial = loadedMaterial;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainLowPolyMaterialAsset material!"));
 	}
 }
