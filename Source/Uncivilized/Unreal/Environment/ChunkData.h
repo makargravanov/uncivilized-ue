@@ -1,17 +1,18 @@
 #pragma once
 
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+
 struct ChunkData {
 	bool isLoaded = false;
 	FIntPoint chunkPosition;
 	UInstancedStaticMeshComponent* chunkMesh;
-	UHierarchicalInstancedStaticMeshComponent* mountainHighPoly;
-	UHierarchicalInstancedStaticMeshComponent* mountainMiddlePoly;
-	UHierarchicalInstancedStaticMeshComponent* mountainLowPoly;
+	UHierarchicalInstancedStaticMeshComponent* mountainMesh;
 
 	ChunkData() : isLoaded(false), chunkMesh(nullptr) {}
 
 	~ChunkData() {
 		chunkMesh = nullptr;
+		mountainMesh = nullptr;
 	}
 
 	ChunkData(const ChunkData&) = delete;
@@ -20,18 +21,14 @@ struct ChunkData {
 	ChunkData(ChunkData&& other) noexcept
 		: chunkPosition(std::move(other.chunkPosition)),
 		  chunkMesh(std::exchange(other.chunkMesh, nullptr)),
-		  mountainHighPoly(std::exchange(other.mountainHighPoly, nullptr)),
-		  mountainMiddlePoly(std::exchange(other.mountainMiddlePoly, nullptr)),
-		  mountainLowPoly(std::exchange(other.mountainLowPoly, nullptr)),
+		  mountainMesh(std::exchange(other.mountainMesh, nullptr)),
 		  isLoaded(std::exchange(other.isLoaded, false)) {}
 
 	ChunkData& operator=(ChunkData&& other) noexcept {
 		if (this != &other) {
 			chunkPosition = std::move(other.chunkPosition);
 			chunkMesh = std::exchange(other.chunkMesh, nullptr);
-			mountainHighPoly = std::exchange(other.mountainHighPoly, nullptr);
-			mountainMiddlePoly = std::exchange(other.mountainMiddlePoly, nullptr);
-			mountainLowPoly = std::exchange(other.mountainLowPoly, nullptr);
+			mountainMesh = std::exchange(other.mountainMesh, nullptr);
 			isLoaded = std::exchange(other.isLoaded, false);
 		}
 		return *this;

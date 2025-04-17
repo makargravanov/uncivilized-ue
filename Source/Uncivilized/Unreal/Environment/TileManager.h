@@ -63,43 +63,24 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	UStaticMesh* hexMesh;
 
 	UPROPERTY()
-	UMaterialInterface* mountainHighPolyMaterial;
-	UPROPERTY()
-	UStaticMesh* mountainHighPolyMesh;
-
-	UPROPERTY()
-	UMaterialInterface* mountainMiddlePolyMaterial;
-	UPROPERTY()
-	UStaticMesh* mountainMiddlePolyMesh;
-
-	UPROPERTY()
-	UMaterialInterface* mountainLowPolyMaterial;
-	UPROPERTY()
-	UStaticMesh* mountainLowPolyMesh;
-
-
-	UPROPERTY()
 	TSoftObjectPtr<UStaticMesh> hexMeshAsset;
 	UPROPERTY()
 	TSoftObjectPtr<UMaterialInterface> baseMaterialAsset;
 
 	UPROPERTY()
-	TSoftObjectPtr<UStaticMesh> mountainHighPolyAsset;
+	TSoftObjectPtr<UStaticMesh> mountainLODAsset;
 	UPROPERTY()
-	TSoftObjectPtr<UMaterialInterface> mountainHighPolyMaterialAsset;
-
-	UPROPERTY()
-	TSoftObjectPtr<UStaticMesh> mountainMiddlePolyAsset;
-	UPROPERTY()
-	TSoftObjectPtr<UMaterialInterface> mountainMiddlePolyMaterialAsset;
-
-	UPROPERTY()
-	TSoftObjectPtr<UStaticMesh> mountainLowPolyAsset;
-	UPROPERTY()
-	TSoftObjectPtr<UMaterialInterface> mountainLowPolyMaterialAsset;
+	UStaticMesh* mountainLODMesh;
 
   private:
 	FTransform calculateTileTransform(const int32 x, const int32 y) const {
+		const bool oddRow = y % 2 == 1;
+		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
+		const float yPos = y * tileVerticalOffset;
+		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
+	}
+
+	FTransform calculateHillTransform(const int32 x, const int32 y) const {
 		const bool oddRow = y % 2 == 1;
 		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
 		const float yPos = y * tileVerticalOffset;
