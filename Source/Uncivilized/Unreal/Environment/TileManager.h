@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <functional>
+#include "BiomeType.h"
+#include "BitMatrix.h"
+#include "ChunkData.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "BiomeType.h"
 #include "HillType.h"
-#include "ChunkData.h"
+#include <functional>
+#include <unordered_map>
 #include "TileManager.generated.h"
 
 #define CHUNK_SIZE 64
@@ -31,11 +32,14 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	float tileHorizontalOffset = 173.205078;
 	float oddRowHorizontalOffset = 86.602539;
 	float tileVerticalOffset = 150.0;
+	uint8_t numberOfTrees = 0;
+
+	BitMatrix16x16* occupancyMasks = nullptr;
 
 	std::unordered_map<FIntPoint, ChunkData> loadedTileChunks;
 
 	BiomeType* tileBiomes = nullptr;
-	uint8_t* heights = nullptr;
+	uint8_t* uint8_t* heights = nullptr;
 
 	uint8_t* rotationsTileHillTypeBitMasks = nullptr; // | 1,2,3,4 | 5,6,7,8 |
 	uint8_t* rotationsForest = nullptr;
@@ -72,6 +76,11 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	UPROPERTY()
 	UStaticMesh* mountainLODMesh;
 
+	UPROPERTY()
+	TSoftObjectPtr<UStaticMesh> pineLODAsset;
+	UPROPERTY()
+	UStaticMesh* pineLODMesh;
+
   private:
 	FTransform calculateTileTransform(const int32 x, const int32 y) const {
 		const bool oddRow = y % 2 == 1;
@@ -81,6 +90,13 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	}
 
 	FTransform calculateHillTransform(const int32 x, const int32 y) const {
+		const bool oddRow = y % 2 == 1;
+		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
+		const float yPos = y * tileVerticalOffset;
+		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
+	}
+
+	FTransform calculateTreeTransform(const int32 x, const int32 y) const {
 		const bool oddRow = y % 2 == 1;
 		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
 		const float yPos = y * tileVerticalOffset;

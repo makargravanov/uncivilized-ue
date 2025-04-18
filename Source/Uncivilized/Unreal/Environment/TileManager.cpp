@@ -3,10 +3,11 @@
 
 ATileManager::ATileManager() {
 	PrimaryActorTick.bCanEverTick = true;
-
-	this->tileBiomes = new BiomeType[2048 * 2048]{};
 	gridHeight = 2048;
 	gridWidth = 2048;
+	numberOfTrees = 30;
+	this->tileBiomes = new BiomeType[gridHeight * gridWidth]{};
+	this->occupancyMasks = new BitMatrix16x16[gridHeight * gridWidth]{};
 }
 
 void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -156,8 +157,8 @@ void ATileManager::BeginPlay() {
 void ATileManager::loadAssets() {
 	hexMeshAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/Hex.Hex")));
 	baseMaterialAsset = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(TEXT("/Game/Materials/HexMaterial.HexMaterial")));
-
 	mountainLODAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/HillLOD.HillLOD")));
+	pineLODAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Meshes/Pine.Pine")));
 
 	if (UStaticMesh* loadedMesh = hexMeshAsset.LoadSynchronous()) {
 		hexMesh = loadedMesh;
@@ -176,6 +177,13 @@ void ATileManager::loadAssets() {
 		mountainLODMesh = loadedMesh;
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainHighPolyAsset mesh!"));
+		UE_LOG(LogTemp, Error, TEXT("Failed to load mountainAsset mesh!"));
+	}
+
+	if (UStaticMesh* loadedMesh = pineLODAsset.LoadSynchronous()) {
+		pineLODMesh = loadedMesh;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to load pineLODAsset mesh!"));
 	}
 }
