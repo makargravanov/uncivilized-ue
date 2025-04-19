@@ -7,12 +7,17 @@ struct ChunkData {
 	FIntPoint chunkPosition;
 	UInstancedStaticMeshComponent* chunkMesh;
 	UHierarchicalInstancedStaticMeshComponent* mountainMesh;
+	UHierarchicalInstancedStaticMeshComponent* pineForest;
 
-	ChunkData() : isLoaded(false), chunkMesh(nullptr) {}
+	ChunkData() : isLoaded(false),
+				  chunkMesh(nullptr),
+				  mountainMesh(nullptr),
+				  pineForest(nullptr) {}
 
-	~ChunkData() {
+	~ChunkData() noexcept {
 		chunkMesh = nullptr;
 		mountainMesh = nullptr;
+		pineForest = nullptr;
 	}
 
 	ChunkData(const ChunkData&) = delete;
@@ -22,6 +27,7 @@ struct ChunkData {
 		: chunkPosition(std::move(other.chunkPosition)),
 		  chunkMesh(std::exchange(other.chunkMesh, nullptr)),
 		  mountainMesh(std::exchange(other.mountainMesh, nullptr)),
+		  pineForest(std::exchange(other.pineForest, nullptr)),
 		  isLoaded(std::exchange(other.isLoaded, false)) {}
 
 	ChunkData& operator=(ChunkData&& other) noexcept {
@@ -29,6 +35,7 @@ struct ChunkData {
 			chunkPosition = std::move(other.chunkPosition);
 			chunkMesh = std::exchange(other.chunkMesh, nullptr);
 			mountainMesh = std::exchange(other.mountainMesh, nullptr);
+			pineForest = std::exchange(other.pineForest, nullptr);
 			isLoaded = std::exchange(other.isLoaded, false);
 		}
 		return *this;

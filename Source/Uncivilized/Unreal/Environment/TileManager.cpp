@@ -13,6 +13,7 @@ ATileManager::ATileManager() {
 void ATileManager::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
 	delete[] this->tileBiomes;
+	delete[] this->occupancyMasks;
 }
 
 void ATileManager::Tick(float DeltaTime) {
@@ -88,12 +89,19 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 	newChunk.mountainMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	newChunk.mountainMesh->RegisterComponent();
 
+	newChunk.pineForest = NewObject<UHierarchicalInstancedStaticMeshComponent>(this);
+	newChunk.pineForest->SetStaticMesh(pineLODMesh);
+	newChunk.pineForest->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	newChunk.pineForest->RegisterComponent();
+
 	for (int32 localY = 0; localY < CHUNK_SIZE; ++localY) {
 		for (int32 localX = 0; localX < CHUNK_SIZE; ++localX) {
 			int32 globalX = chunkPos.X * CHUNK_SIZE + localX;
 			int32 globalY = chunkPos.Y * CHUNK_SIZE + localY;
 
 			if (globalX >= 0 && globalX < gridWidth && globalY >= 0 && globalY < gridHeight) {
+				bool flag = true;
+
 				FTransform tileTransform = calculateTileTransform(globalX, globalY);
 				newChunk.chunkMesh->AddInstance(tileTransform);
 
@@ -107,6 +115,12 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 				FTransform hillTransform = calculateHillTransform(globalX, globalY);
 				if (FMath::RandRange(0, 10) == 5) {
 					newChunk.mountainMesh->AddInstance(tileTransform);
+					flag = false;
+				}
+			
+				if (flag) {
+					FTransform pineTransform = calculateTreeTransform(globalX, globalY);
+					newChunk.pineForest->AddInstance(tileTransform);
 				}
 			}
 		}
@@ -129,6 +143,11 @@ void ATileManager::unloadChunk(const FIntPoint& chunkPos) {
 			chunk.mountainMesh->DestroyComponent();
 			chunk.mountainMesh = nullptr;
 		}
+		if (chunk.pineForest) {
+			chunk.pineForest->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+			chunk.pineForest->DestroyComponent();
+			chunk.pineForest = nullptr;
+		}
 		loadedTileChunks.erase(it);
 	}
 }
@@ -142,11 +161,13 @@ void ATileManager::BeginPlay() {
 	Super::BeginPlay();
 	loadAssets();
 
-	if (!hexMesh || !mountainLODMesh || !baseMaterial)
+	if (!hexMesh || !mountainLODMesh || !baseMaterial || !pineLODMesh) {
 		return;
+	}
 
 	for (size_t i = 0; i < (static_cast<uint32_t>(gridHeight) * static_cast<uint32_t>(gridWidth)); i++) {
 		tileBiomes[i] = FMath::RandBool() ? BiomeType::GRASSLAND : BiomeType::CHAPPARAL;
+		occupancyMasks[i].setAllTrue();
 	}
 
 	if (AActor* player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) {

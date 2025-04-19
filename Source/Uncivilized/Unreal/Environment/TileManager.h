@@ -3,11 +3,11 @@
 #pragma once
 
 #include "BiomeType.h"
-#include "BitMatrix.h"
 #include "ChunkData.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HillType.h"
+#include "Uncivilized/Unreal/Util/BitMatrix.h"
 #include <functional>
 #include <unordered_map>
 #include "TileManager.generated.h"
@@ -39,7 +39,7 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	std::unordered_map<FIntPoint, ChunkData> loadedTileChunks;
 
 	BiomeType* tileBiomes = nullptr;
-	uint8_t* uint8_t* heights = nullptr;
+    uint8_t* heights = nullptr;
 
 	uint8_t* rotationsTileHillTypeBitMasks = nullptr; // | 1,2,3,4 | 5,6,7,8 |
 	uint8_t* rotationsForest = nullptr;

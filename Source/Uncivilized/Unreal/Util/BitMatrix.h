@@ -9,6 +9,14 @@ struct BitMatrix16x16 {
 		return (data[x] >> y) & 1U;
 	}
 
+	inline void setAllTrue() {
+		memset(data, 0xFF, sizeof(data));
+	}
+
+	inline void setAllFalse() {
+		memset(data, 0, sizeof(data));
+	}
+
 	inline void set(uint8_t x, uint8_t y, bool value) {
 		value ? data[x] |= (1U << y) : data[x] &= ~(1U << y);
 	}
