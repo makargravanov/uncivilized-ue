@@ -72,7 +72,38 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 	if (loadedTileChunks.find(chunkPos) != loadedTileChunks.end()) {
 		return;
 	}
-
+	const double points[30][2] = {
+		{-38.96, -55.36},
+		{40.96, 35.34},
+		{-48.73, 1.07},
+		{25.96, 8.99},
+		{79.19, -32.68},
+		{60.19, 20.75},
+		{6.27, 94.62},
+		{-21.04, 10.41},
+		{-72.78, -53.44},
+		{23.5, -27.03},
+		{-56.96, 45.83},
+		{-58.3, -24.11},
+		{84.79, 28.0},
+		{9.86, 36.92},
+		{59.38, 55.2},
+		{71.8, -8.23},
+		{10.63, -47.45},
+		{-17.42, -56.14},
+		{-67.61, 25.49},
+		{50.59, -15.57},
+		{-84.61, 44.14},
+		{-40.39, 28.19},
+		{65.1, -47.32},
+		{18.87, -69.43},
+		{-86.5, -35.17},
+		{-71.76, -2.8},
+		{-40.69, 74.49},
+		{-4.73, 56.92},
+		{-16.87, -32.14},
+		{8.72, -89.88}};
+		
 	ChunkData newChunk;
 	newChunk.chunkPosition = chunkPos;
 	newChunk.isLoaded = true;
@@ -112,15 +143,18 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 					biome == BiomeType::GRASSLAND ? 0.0f : 1.0f,
 					true);
 
-				FTransform hillTransform = calculateHillTransform(globalX, globalY);
 				if (FMath::RandRange(0, 10) == 5) {
-					newChunk.mountainMesh->AddInstance(tileTransform);
+					FTransform hillTransform = calculateHillTransform(globalX, globalY);
+					newChunk.mountainMesh->AddInstance(hillTransform);
 					flag = false;
 				}
 			
 				if (flag) {
-					FTransform pineTransform = calculateTreeTransform(globalX, globalY);
-					newChunk.pineForest->AddInstance(tileTransform);
+					for (size_t i = 0; i < 30; i++)
+					{
+						FTransform pineTransform = calculateTreeTransform(globalX, globalY, points[i][0], points[i][1]);
+						newChunk.pineForest->AddInstance(pineTransform);
+					}
 				}
 			}
 		}

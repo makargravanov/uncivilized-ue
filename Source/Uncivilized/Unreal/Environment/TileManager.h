@@ -82,25 +82,25 @@ class UNCIVILIZED_API ATileManager : public AActor {
 	UStaticMesh* pineLODMesh;
 
   private:
-	FTransform calculateTileTransform(const int32 x, const int32 y) const {
+	inline FTransform calculateTileTransform(const int32 x, const int32 y) const {
 		const bool oddRow = y % 2 == 1;
 		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
 		const float yPos = y * tileVerticalOffset;
 		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
 	}
 
-	FTransform calculateHillTransform(const int32 x, const int32 y) const {
+	inline FTransform calculateHillTransform(const int32 x, const int32 y) const {
 		const bool oddRow = y % 2 == 1;
 		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
 		const float yPos = y * tileVerticalOffset;
 		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
 	}
 
-	FTransform calculateTreeTransform(const int32 x, const int32 y) const {
+	inline FTransform calculateTreeTransform(const int32 x, const int32 y, float xMod, float yMod) const {
 		const bool oddRow = y % 2 == 1;
 		const float xPos = oddRow ? x * tileHorizontalOffset + oddRowHorizontalOffset : x * tileHorizontalOffset;
 		const float yPos = y * tileVerticalOffset;
-		return FTransform(FRotator::ZeroRotator, FVector(xPos, yPos, 0.0f));
+		return FTransform(FRotator::ZeroRotator, FVector(xPos+xMod, yPos+yMod, 0.0f));
 	}
 
 	void updateTileMaterial(UInstancedStaticMeshComponent* instancedStaticMeshes, const int32 instanceIndex, float num) const {
