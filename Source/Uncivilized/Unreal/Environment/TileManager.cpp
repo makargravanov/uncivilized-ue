@@ -68,11 +68,7 @@ FIntPoint ATileManager::worldToChunkPosition(const FVector& worldPosition) const
 	return FIntPoint(chunkX, chunkY);
 }
 
-void ATileManager::loadChunk(const FIntPoint& chunkPos) {
-	if (loadedTileChunks.find(chunkPos) != loadedTileChunks.end()) {
-		return;
-	}
-	const double points[30][2] = {
+const double points[30][2] = {
 		{-38.96, -55.36},
 		{40.96, 35.34},
 		{-48.73, 1.07},
@@ -103,7 +99,11 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 		{-4.73, 56.92},
 		{-16.87, -32.14},
 		{8.72, -89.88}};
-		
+
+void ATileManager::loadChunk(const FIntPoint& chunkPos) {
+	if (loadedTileChunks.find(chunkPos) != loadedTileChunks.end()) {
+		return;
+	}
 	ChunkData newChunk;
 	newChunk.chunkPosition = chunkPos;
 	newChunk.isLoaded = true;
@@ -124,6 +124,8 @@ void ATileManager::loadChunk(const FIntPoint& chunkPos) {
 	newChunk.pineForest->SetStaticMesh(pineLODMesh);
 	newChunk.pineForest->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	newChunk.pineForest->RegisterComponent();
+	newChunk.pineForest->InstanceStartCullDistance = 5000;
+	newChunk.pineForest->InstanceEndCullDistance = 5000;
 
 	for (int32 localY = 0; localY < CHUNK_SIZE; ++localY) {
 		for (int32 localX = 0; localX < CHUNK_SIZE; ++localX) {
